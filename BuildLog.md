@@ -62,3 +62,13 @@
 
 ### Done:
     - All tasks were completed successfully.
+
+## Session 5: 2026-06-25
+### Duration: 2 Hours
+### Tasks:
+    - Implemented Constructor and Destructor copy constructor and assignment operator for the HashMap class.
+    - Removed code from the architecture proposal that is not relevant as the implemention needs to be hidden.
+
+### Problem Encountered:
+    - No problems were encountered during this session.
+

@@ -149,7 +149,7 @@ struct Node {
     K key;
     V value;
     Node* next;
-    Node(const K& k, const V& v) : key(k), value(v), next(nullptr) {}
+    Node(const K& k, const V& v);
 };
 ```
 
@@ -162,9 +162,9 @@ struct Node {
 ### 3.2 Member Variables
 
 ```cpp
-Node** buckets;       // Heap-allocated array of Node* pointers
-size_t bucketCount;   // Length of the buckets array (number of slots)
-size_t elementCount;  // Total number of key-value pairs stored
+Node** buckets;
+size_t bucketCount;
+size_t elementCount;
 ```
 
 **`Node** buckets`**: A pointer to a heap-allocated array of `Node*`. Each `buckets[i]` is either `nullptr` (empty bucket) or the head of a collision chain. The double-pointer notation: the outer `*` says "this is a pointer," and the element type `Node*` says each slot holds a pointer.
@@ -237,19 +237,7 @@ $$\text{Hash}(S) = \left(\sum_{i=0}^{L-1} S[i] \cdot 31^{L-1-i}\right) \bmod m$$
 
 where m = `bucketCount`. Each character is treated as its ASCII integer value and multiplied by a power of the base (31). The sum is taken modulo m to produce a valid bucket index in `[0, m)`.
 
-**Computed iteratively** to avoid computing huge powers explicitly:
-
-```cpp
-size_t HashMap::hash(const K& key) const noexcept {
-    size_t h = 0;
-    for (char c : key) {
-        h = h * 31 + static_cast<size_t>(c);
-    }
-    return h % bucketCount;
-}
-```
-
-Each loop iteration is equivalent to `h = h × 31 + c`, which accumulates the polynomial left-to-right using Horner's method: `((S[0]×31 + S[1])×31 + S[2])×31 + ...` — mathematically identical to the formula but requires only one multiply and one add per character.
+**Computed iteratively** via Horner's method: each loop iteration is equivalent to `h = h × 31 + c`, which accumulates the polynomial left-to-right using Horner's method: `((S[0]×31 + S[1])×31 + S[2])×31 + ...` — mathematically identical to the formula but requires only one multiply and one add per character.
 
 ### 5.2 Why Base 31
 
@@ -374,23 +362,13 @@ Each bucket slot holds a **singly linked list** of nodes. A singly linked list (
 
 ### 8.1 Default Constructor
 
-```cpp
-HashMap::HashMap() : bucketCount(16), elementCount(0) {
-    buckets = new Node*[bucketCount]();    // () zero-initializes all slots to nullptr
-}
-```
+
 
 **Initial capacity = 16**: Chosen as a small power of two. Starting with 1 bucket would trigger rehash immediately. 16 allows ~12 elements before the first rehash (12/16 = 0.75). The `()` after `new Node*[...]` is essential — without it, the array contains garbage pointers instead of `nullptr`, and every bucket lookup would dereference an invalid address.
 
 ### 8.2 Copy Constructor
 
-```cpp
-HashMap::HashMap(const HashMap& other)
-    : bucketCount(other.bucketCount), elementCount(0) {
-    buckets = new Node*[bucketCount]();
-    copyFrom(other);
-}
-```
+
 
 `copyFrom` traverses every bucket and every chain in `other`, calling `set(node->key, node->value)` for each node. This deep-copies every key-value pair into a brand-new, independent bucket array and node chain set.
 
@@ -398,19 +376,6 @@ HashMap::HashMap(const HashMap& other)
 
 ### 8.3 Copy Assignment Operator
 
-```cpp
-HashMap& HashMap::operator=(const HashMap& other) {
-    if (this != &other) {
-        clear();                          // Destroy all existing chains
-        delete[] buckets;                 // Free old bucket array
-        bucketCount = other.bucketCount;
-        elementCount = 0;
-        buckets = new Node*[bucketCount]();
-        copyFrom(other);
-    }
-    return *this;
-}
-```
 
 **Self-assignment guard**: Without `if (this != &other)`, `clear()` would destroy all nodes, then `copyFrom(other)` would attempt to traverse destroyed chains — undefined behavior.
 
@@ -418,13 +383,7 @@ HashMap& HashMap::operator=(const HashMap& other) {
 
 ### 8.4 Destructor
 
-```cpp
-HashMap::~HashMap() noexcept {
-    clear();           // Delete every node in every chain
-    delete[] buckets;  // Free the bucket array itself
-    buckets = nullptr;
-}
-```
+
 
 **Two-step cleanup**: `clear()` only walks the chains and `delete`s the nodes — it does not free `buckets`. The `delete[] buckets` line frees the array of pointers. Both steps are required; skipping either leaks memory.
 
@@ -454,7 +413,7 @@ private:
         K key;
         V value;
         Node* next;
-        Node(const K& k, const V& v) : key(k), value(v), next(nullptr) {}
+        Node(const K& k, const V& v);
     };
 
     Node** buckets;
