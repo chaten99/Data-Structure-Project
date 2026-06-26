@@ -174,3 +174,13 @@ bool HashMap<K, V>::contains(const K& key) const {
     }
     return false;
 }
+
+template<typename K, typename V>
+size_t HashMap<K, V>::size() const noexcept {
+    return elementCount;
+}
+
+template<typename K, typename V>
+bool HashMap<K, V>::empty() const noexcept {
+    return elementCount == 0;
+}
