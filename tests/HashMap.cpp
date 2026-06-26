@@ -64,12 +64,70 @@ void testRuleOfThree() {
     assert(map3.get("B") == 2);
 }
 
+void testContains() {
+    HashMap<std::string, int> map;
+    map.set("Alpha", 10);
+
+    assert(map.contains("Alpha"));
+    assert(!map.contains("Beta"));
+}
+
+void testRemove() {
+    HashMap<std::string, int> map;
+    map.set("One", 1);
+    map.set("Two", 2);
+    map.set("Three", 3);
+
+    map.remove("Two");
+    assert(!map.contains("Two"));
+    assert(map.contains("One"));
+    assert(map.contains("Three"));
+
+    bool caught = false;
+    try {
+        map.get("Two");
+    } catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+
+    caught = false;
+    try {
+        map.remove("Ghost");
+    } catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+}
+
+void testClear() {
+    HashMap<std::string, int> map;
+    map.set("X", 100);
+    map.set("Y", 200);
+
+    map.clear();
+
+    assert(!map.contains("X"));
+    assert(!map.contains("Y"));
+
+    bool caught = false;
+    try {
+        map.get("X");
+    } catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+}
+
 int main() {
     testSetAndGet();
     testGetException();
     testRehashing();
     testRuleOfThree();
+    testContains();
+    testRemove();   
+    testClear();
 
-    std::cout << "Phase 1 tests (set, get, rehash, Rule of Three) passed successfully!\n";
+    std::cout << "All Phase 2 tests passed successfully!\n";
     return 0;
 }

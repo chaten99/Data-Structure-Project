@@ -135,3 +135,42 @@ template<typename K, typename V>
 float HashMap<K, V>::loadFactor() const noexcept {
     return static_cast<float>(elementCount) / static_cast<float>(bucketCount);
 }
+
+
+
+template<typename K, typename V>
+void HashMap<K, V>::remove(const K& key) {
+    size_t index = hash(key) % bucketCount;
+    Node* current = buckets[index];
+    Node* prev = nullptr;
+
+    while(current != nullptr) {
+        if(current->key == key) {
+            if(prev == nullptr) {
+                buckets[index] = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            delete current;
+            --elementCount;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+    throw std::out_of_range("Key not found in HashMap");
+}
+
+template<typename K, typename V>
+bool HashMap<K, V>::contains(const K& key) const {
+    size_t index = hash(key) % bucketCount;
+    Node* current = buckets[index];
+
+    while(current != nullptr) {
+        if(current->key == key){
+            return true;
+        }
+        current = current -> next;
+    }
+    return false;
+}
