@@ -7,7 +7,7 @@
 void RedisCLI::run() {
     std::string line;
     std::cout << "Redis Lite\n";
-    std::cout << "Type 'exit' to quit.\n";
+    std::cout << "Type 'help' for commands, or 'exit' to quit.\n";
 
     while (true) {
         std::cout << "redis> ";
@@ -25,6 +25,28 @@ void RedisCLI::run() {
 
         if (cmd == "EXIT" || cmd == "QUIT") {
             break;
+        }
+        else if (cmd == "HELP") {
+            std::cout << "\n";
+            std::cout << "  +-----------------------------------------------------------+\n";
+            std::cout << "  |                     REDIS LITE HELP                       |\n";
+            std::cout << "  +-----------------------------------------------------------+\n";
+            std::cout << "  | SET key value  - Set the string value of a key            |\n";
+            std::cout << "  | GET key        - Get the value of a key                   |\n";
+            std::cout << "  | DEL key        - Delete a key                             |\n";
+            std::cout << "  | EXISTS key     - Determine if a key exists                |\n";
+            std::cout << "  | DBSIZE         - Return the number of keys in the db      |\n";
+            std::cout << "  | FLUSHDB        - Remove all keys from the db              |\n";
+            std::cout << "  | HELP           - Show this help menu                      |\n";
+            std::cout << "  | EXIT / QUIT    - Exit the CLI                             |\n";
+            std::cout << "  +-----------------------------------------------------------+\n\n";
+        }
+        else if (cmd == "DBSIZE") {
+            std::cout << "(integer) " << redisData.size() << "\n";
+        }
+        else if (cmd == "FLUSHDB") {
+            redisData.clear();
+            std::cout << "OK\n";
         }
         else if (cmd == "SET") {
             ss >> key;
